@@ -1,3 +1,7 @@
+#[submodule "aw-webui"]
+#	path = aw-webui
+#	url = https://github.com/jaskarannagi19/aw-webui
 [submodule "aw-webui"]
 	path = aw-webui
 	url = https://github.com/jaskarannagi19/aw-webui
+	branch = master

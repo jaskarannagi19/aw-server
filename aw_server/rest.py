@@ -8,7 +8,7 @@ import iso8601
 from datetime import datetime, timedelta
 
 from aw_core import schema
-from aw_core.models import Event
+from aw_core.models import Event, UserInfo
 from aw_query.exceptions import QueryException
 
 from . import logger
@@ -357,9 +357,13 @@ class saveUserInfo(Resource):
     def get(self, bucket_id):
         return "Get"
     
-    def post(self):
+    def post(self,bucket_id):
         data = request.get_json()
-        print(data)
+        
+        userinfo = [UserInfo(**data)]
+        
+        userinfo = current_app.api.create_userinfo(bucket_id, userinfo)
+        
         return "Hello"
 
 

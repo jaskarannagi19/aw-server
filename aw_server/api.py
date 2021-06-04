@@ -8,7 +8,7 @@ import json
 import logging
 import iso8601
 
-from aw_core.models import Event
+from aw_core.models import Event, UserInfo
 from aw_core.log import get_log_file_path
 from aw_core.dirs import get_data_dir
 
@@ -172,6 +172,14 @@ class ServerAPI:
             event.to_json_dict() for event in self.db[bucket_id].get(limit, start, end)
         ]
         return events
+
+    @check_bucket_exists
+    def create_userinfo(self, bucket_id: str, userData: List[UserInfo]) -> Optional[UserInfo]:
+        """Create events for a bucket. Can handle both single events and multiple ones.
+
+        Returns the inserted event when a single event was inserted, otherwise None."""
+        return self.db[bucket_id].insert(userData)
+
 
     @check_bucket_exists
     def create_events(self, bucket_id: str, events: List[Event]) -> Optional[Event]:
