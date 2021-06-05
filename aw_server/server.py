@@ -92,7 +92,14 @@ def _config_cors(cors_origins: List[str], testing: bool):
     # See: https://flask-cors.readthedocs.org/en/latest/
     CORS(current_app, resources={r"/api/*": {"origins": cors_origins}})
 
-def print_date_time(api):
+def print_date_time():
+
+    storage_method = aw_datastore.get_storage_methods()["peewee"]
+    
+    db = Datastore(storage_method)
+    
+    api = ServerAPI(db=db)
+
     _query = """
         window = flood(query_bucket(find_bucket("aw-watcher-window_")));
         afk = flood(query_bucket(find_bucket("aw-watcher-afk_")));
@@ -127,7 +134,7 @@ def _start(
     try:
 
         scheduler = BackgroundScheduler()
-        scheduler.add_job(func=print_date_time,args=app.api, trigger="interval", seconds=60)
+        scheduler.add_job(func=print_date_time, trigger="interval", seconds=60)
         scheduler.start()
 
         # Shut down the scheduler when exiting the app
