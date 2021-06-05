@@ -368,7 +368,8 @@ class saveUserInfo(Resource):
         print(userinfo)
         bucket_id="aw-watcher-window_Aspire"     #TODO:: FIX ME   
         
-        userinfo = current_app.api.create_userinfo( userinfo)
+        userinfo = current_app.api.create_userinfo( name="Jaskaran",email="asd@asd.com",age=30,userfrom="India"
+        ,timeskills="so so", unproductive_websites=".com", productive_websites=".com")
         
         return "Hello"
 
