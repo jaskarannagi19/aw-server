@@ -15,7 +15,8 @@ from . import rest
 from aw_client import ActivityWatchClient
 from datetime import datetime, timedelta, timezone
 
-
+from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +92,8 @@ def _config_cors(cors_origins: List[str], testing: bool):
     # See: https://flask-cors.readthedocs.org/en/latest/
     CORS(current_app, resources={r"/api/*": {"origins": cors_origins}})
 
-
+def print_date_time():
+    print('hiiiiiiiiii')
 # Only to be called from aw_server.main function!
 def _start(
     storage_method,
@@ -105,6 +107,25 @@ def _start(
     )
     
     try:
+
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(func=print_date_time, trigger="interval", seconds=60)
+        scheduler.start()
+
+        # Shut down the scheduler when exiting the app
+        atexit.register(lambda: scheduler.shutdown())
+
+
+
+
+        app.run(
+            debug=testing,
+            host=host,
+            port=port,
+            request_handler=FlaskLogHandler,
+            use_reloader=False,
+            threaded=False,
+        )
 
         #attrs = vars(db['storage_strategy'])
         #print(', '.join("%s: %s" % item for item in attrs.items()))
@@ -125,17 +146,6 @@ def _start(
         print(timeperiods)
         ##result = app.api.query2('hi',_query,timeperiods,None)
         ##print(result)
-        
-
-        
-        app.run(
-            debug=testing,
-            host=host,
-            port=port,
-            request_handler=FlaskLogHandler,
-            use_reloader=False,
-            threaded=False,
-        )
     except OSError as e:
         logger.error(str(e))
         raise e
