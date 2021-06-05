@@ -114,9 +114,12 @@ def print_date_time():
     timeperiods=[str(now - timedelta(hours=1)) + '/'+  str(now + timedelta(hours=1))]
         
     try:
+        print('Querying..................')
         result = api.query2('Events to send.',_query,timeperiods,None)
         print(result) #Write requests to send events to external server with user email id.
+        
     except:
+        print("Failed........")
         pass
     
 # Only to be called from aw_server.main function!
