@@ -92,7 +92,7 @@ def _config_cors(cors_origins: List[str], testing: bool):
     # See: https://flask-cors.readthedocs.org/en/latest/
     CORS(current_app, resources={r"/api/*": {"origins": cors_origins}})
 
-def print_date_time(app):
+def print_date_time(api):
     _query = """
         window = flood(query_bucket(find_bucket("aw-watcher-window_")));
         afk = flood(query_bucket(find_bucket("aw-watcher-afk_")));
@@ -107,7 +107,7 @@ def print_date_time(app):
     timeperiods=[str(now - timedelta(hours=1)) + '/'+  str(now + timedelta(hours=1))]
         
     try:
-        result = app.api.query2('Events to send.',_query,timeperiods,None)
+        result = api.query2('Events to send.',_query,timeperiods,None)
         print(result) #Write requests to send events to external server with user email id.
     except:
         pass
@@ -127,7 +127,7 @@ def _start(
     try:
 
         scheduler = BackgroundScheduler()
-        scheduler.add_job(func=print_date_time,args=app, trigger="interval", seconds=60)
+        scheduler.add_job(func=print_date_time,args=app.api, trigger="interval", seconds=60)
         scheduler.start()
 
         # Shut down the scheduler when exiting the app
