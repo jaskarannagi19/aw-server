@@ -58,7 +58,7 @@ requests = "^2.22.0"
 type = "git"
 url = "https://github.com/jaskarannagi19/aw-client.git"
 reference = "master"
-resolved_reference = "52e4d3b7ee43ddc7f6c66d25bd20e7ea46261bc9"
+resolved_reference = "364c312794c7a7dc385f7fd2fe340cc2a57e2731"
 
 [[package]]
 name = "aw-core"
@@ -86,7 +86,7 @@ mongo = ["pymongo (>=3.10.0,<4.0.0)"]
 type = "git"
 url = "https://github.com/jaskarannagi19/aw-core.git"
 reference = "master"
-resolved_reference = "43d05c95e7d534eec4e110923d3a5d7a3a833bb3"
+resolved_reference = "a9c95551db7e2ae6b73a5419a90c8308b1b8e0e4"
 
 [[package]]
 name = "certifi"

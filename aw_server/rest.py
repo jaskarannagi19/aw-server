@@ -357,10 +357,16 @@ class saveUserInfo(Resource):
     def get(self, bucket_id):
         return "Get"
     
-    def post(self,bucket_id):
+    def post(self):
         data = request.get_json()
         
-        userinfo = [UserInfo(**data)]
+        userinfo =UserInfo(name="Jaskaran",email="asd@asd.com",age=30,userfrom="India"
+        ,timeskills="so so", unproductive_websites=".com", productive_websites=".com")
+        
+
+
+        print(userinfo)
+        bucket_id="aw-watcher-window_Aspire"     #TODO:: FIX ME   
         
         userinfo = current_app.api.create_userinfo(bucket_id, userinfo)
         
