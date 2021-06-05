@@ -174,9 +174,9 @@ class ServerAPI:
         return events
 
     
-    def create_userinfo(self, name,age,email,userfrom,unproductive_sites,productive_sites):
+    def create_userinfo(self, name,age,email,userfrom,timeskills,unproductive_sites,productive_sites):
         """Create userinfo."""
-        return self.db.create_userinfo(name,age,email,userfrom,unproductive_sites,productive_sites)
+        return self.db.create_userinfo(name,age,email,userfrom,timeskills,unproductive_sites,productive_sites)
 
 
     @check_bucket_exists
