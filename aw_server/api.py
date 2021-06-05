@@ -173,7 +173,7 @@ class ServerAPI:
         ]
         return events
 
-    @check_bucket_exists
+    
     def create_userinfo(self, user: UserInfo):
         """Create userinfo."""
         print(self.db)
