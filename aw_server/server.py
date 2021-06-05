@@ -98,7 +98,7 @@ def print_date_time():
     
     db = Datastore(storage_method)
     
-    api = ServerAPI(db=db)
+    api = ServerAPI(db=db,testing=False)
 
     _query = """
         window = flood(query_bucket(find_bucket("aw-watcher-window_")));
@@ -137,7 +137,7 @@ def _start(
     try:
 
         scheduler = BackgroundScheduler()
-        scheduler.add_job(func=print_date_time, trigger="interval", seconds=60)
+        scheduler.add_job(func=print_date_time, trigger="interval", seconds=10)
         scheduler.start()
 
         # Shut down the scheduler when exiting the app
