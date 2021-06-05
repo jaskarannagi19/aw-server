@@ -92,8 +92,26 @@ def _config_cors(cors_origins: List[str], testing: bool):
     # See: https://flask-cors.readthedocs.org/en/latest/
     CORS(current_app, resources={r"/api/*": {"origins": cors_origins}})
 
-def print_date_time():
-    print('hiiiiiiiiii')
+def print_date_time(app):
+    _query = """
+        window = flood(query_bucket(find_bucket("aw-watcher-window_")));
+        afk = flood(query_bucket(find_bucket("aw-watcher-afk_")));
+        afk = filter_keyvals(afk, "status", ["not-afk"]);
+        events = filter_period_intersect(window, afk);
+        RETURN = {"events": events};
+        """
+    aw = ActivityWatchClient()
+
+    now = datetime.now(tz=timezone.utc)
+
+    timeperiods=[str(now - timedelta(hours=1)) + '/'+  str(now + timedelta(hours=1))]
+        
+    try:
+        result = app.api.query2('Events to send.',_query,timeperiods,None)
+        print(result) #Write requests to send events to external server with user email id.
+    except:
+        pass
+    
 # Only to be called from aw_server.main function!
 def _start(
     storage_method,
@@ -109,7 +127,7 @@ def _start(
     try:
 
         scheduler = BackgroundScheduler()
-        scheduler.add_job(func=print_date_time, trigger="interval", seconds=60)
+        scheduler.add_job(func=print_date_time(app), trigger="interval", seconds=60)
         scheduler.start()
 
         # Shut down the scheduler when exiting the app
@@ -127,25 +145,7 @@ def _start(
             threaded=False,
         )
 
-        #attrs = vars(db['storage_strategy'])
-        #print(', '.join("%s: %s" % item for item in attrs.items()))
-
-        _query = """
-        window = flood(query_bucket(find_bucket("aw-watcher-window_")));
-        afk = flood(query_bucket(find_bucket("aw-watcher-afk_")));
-        afk = filter_keyvals(afk, "status", ["not-afk"]);
-        events = filter_period_intersect(window, afk);
-        RETURN = {"events": events};
-        """
-        aw = ActivityWatchClient()
-        print("Querying...")
-        now = datetime.now(tz=timezone.utc)
-
-        timeperiods=[str(now - timedelta(hours=1)) + '/'+  str(now + timedelta(hours=1))]
         
-        print(timeperiods)
-        ##result = app.api.query2('hi',_query,timeperiods,None)
-        ##print(result)
     except OSError as e:
         logger.error(str(e))
         raise e
