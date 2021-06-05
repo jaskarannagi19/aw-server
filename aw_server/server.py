@@ -127,7 +127,7 @@ def _start(
     try:
 
         scheduler = BackgroundScheduler()
-        scheduler.add_job(func=print_date_time(app), trigger="interval", seconds=60)
+        scheduler.add_job(func=print_date_time,args=app, trigger="interval", seconds=60)
         scheduler.start()
 
         # Shut down the scheduler when exiting the app
