@@ -14,8 +14,9 @@ from aw_query.exceptions import QueryException
 from . import logger
 from .api import ServerAPI
 from .exceptions import BadRequest, Unauthorized
-
-
+import json
+import requests
+from flask import jsonify, make_response
 # SECURITY
 # As we work our way through features, disable (while this is False, we should only accept connections from localhost)
 SECURITY_ENABLED = False
@@ -351,7 +352,9 @@ class ImportAllResource(Resource):
 
 
 # SaveUserInfo
-
+def myconverter(o):
+    if isinstance(o, datetime):
+        return o.__str__()
 @api.route("/0/userinfo")
 class saveUserInfo(Resource):
     def get(self, bucket_id):
@@ -360,10 +363,17 @@ class saveUserInfo(Resource):
     def post(self):
         data = request.get_json()
 
-        userinfo = current_app.api.create_userinfo(name="Jaskaran",email="asd@asd.com",age=30,userfrom="India"
-        ,timeskills="so so", unproductive_websites=".com", productive_websites=".com")
-        
-        return userinfo
+        print(data)
+        userinfo1 = current_app.api.create_userinfo(name=data['name'],email=data['email'],age=data['age'],userfrom=data['from']
+        ,timeskills=data['timeskills'], unproductive_websites=data['unproductive_websites'], productive_websites=data["productive_websites"])
+        #CODE USER DJANGO SAVE....
+        url = "http://127.0.0.1:8000/userinfo/"
+        message ={'messageuser': data}#, 'email':'asd@asd.com'} 
+
+        headers = {'Content-type': 'application/json'}
+        response = requests.post(url,data=json.dumps(message), headers=headers)
+
+        return 200,None
 
 
 @api.route("/0/log")

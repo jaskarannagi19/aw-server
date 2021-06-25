@@ -17,6 +17,12 @@ from datetime import datetime, timedelta, timezone
 
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
+import requests
+import json
+
+from plyer.utils import platform
+from plyer import notification
+
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +98,20 @@ def _config_cors(cors_origins: List[str], testing: bool):
     # See: https://flask-cors.readthedocs.org/en/latest/
     CORS(current_app, resources={r"/api/*": {"origins": cors_origins}})
 
+def myconverter(o):
+    if isinstance(o, datetime):
+        return o.__str__()
+
+unproudctivemints = {}
+def get_key(val):
+    keylist=[]
+    for key, value in unproudctivemints.items():
+         if value>val:
+             keylist.append(key)
+             return keylist
+ 
+    return []
+unproudctive = 0
 def print_date_time():
 
     storage_method = aw_datastore.get_storage_methods()["peewee"]
@@ -111,16 +131,73 @@ def print_date_time():
 
     now = datetime.now(tz=timezone.utc)
 
-    timeperiods=[str(now - timedelta(hours=1)) + '/'+  str(now + timedelta(hours=1))]
+    timeperiods=[str(now - timedelta(minutes=10)) + '/'+  str(now)] #GET 1MINTS before events from now
         
-    try:
-        print('Querying..................')
-        result = api.query2('Events to send.',_query,timeperiods,None)
-        print(result) #Write requests to send events to external server with user email id.
+    #try:
+    result = api.query2('Events to send.',_query,timeperiods,None)
+    print(result)
+    #GET USER EMAIL
+    url = "http://127.0.0.1:8000/data/"
+    data = {'message': result, 'email':'asd@asd.com'} 
+    headers = {'Content-type': 'application/json'}
+    #response = requests.post(url, data=json.dumps(result,default = myconverter), headers=headers)
+
+    ## notification
+    
+    event = result[0]
+    event_data= event['events']
+    
+    global unproudctivemints
+    global unproudctive
+
+    idList= get_key(0)
+
+    print(event_data)
+    for i in event_data:
+        duration = i['duration']
+        duration = duration.seconds % 3600 / 60.0
+        print(duration)
+        data = i['data']
+        id=i['id']
+        print(data)
+        title = data['title']
+        if id in idList:
+            unproudctivemints[id]=duration + unproudctive
+        else:
+        #    duration_old=unproudctivemints[id]
+        #    duration=duration+duration_old 
+            unproudctivemints[id]=duration
+    idList= get_key(2)
+    
+    
+    if len(idList)>0:
+        for i in idList:
+            for k in event_data:
+                print(k)
+                print(i)
+                print("sending notification")
+                if k['id']==i:
+                    ktitle=k['data']['title']
+                    kapp=k['data']['app']
+
+                    notification.notify(
+                    title=ktitle,
+                    message='More than 2 mints',
+                    app_name=kapp,
+                    app_icon='path/to/the/icon.' + ('ico' if platform == 'win' else 'png')
+                    )
+                    unproudctive = -2
+
+                #unproudctivemints = 0
+    #if duration > 30:
+    #    print(duration)
+    #    
+    #print(duration.seconds)
         
-    except:
-        print("Failed........")
-        pass
+        
+    #except:``
+    #    print("Failed........")
+    #    pass
     
 # Only to be called from aw_server.main function!
 def _start(
@@ -136,15 +213,13 @@ def _start(
     
     try:
 
+
         scheduler = BackgroundScheduler()
-        scheduler.add_job(func=print_date_time, trigger="interval", seconds=10)
+        scheduler.add_job(func=print_date_time, trigger="interval", seconds=120)
         scheduler.start()
 
         # Shut down the scheduler when exiting the app
         atexit.register(lambda: scheduler.shutdown())
-
-
-
 
         app.run(
             debug=testing,
